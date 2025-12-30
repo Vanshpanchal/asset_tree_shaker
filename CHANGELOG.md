@@ -5,11 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2024-12-30
+
+### Changed
+
+- Updated author email to vansh.panchal7@proton.me
+
+---
+
 ## [1.1.0] - 2024-12-30
 
 ### Added
 
-- **New `check` Command** - All-in-one command for asset analysis
+- **New `check` Command** - All-in-one command for asset analysis   
      - Shows all assets with visual used/unused status indicators
      - Displays file sizes and colored status labels
      - Automatically generates markdown report
