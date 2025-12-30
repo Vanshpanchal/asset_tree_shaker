@@ -1,0 +1,102 @@
+# Asset Tree Shaker Configuration Example
+# https://github.com/your-org/asset_tree_shaker
+#
+# Copy this file to your project root and rename to:
+# - asset_tree_shaker.yaml (recommended)
+# - .asset_tree_shaker.yaml (hidden file)
+
+# ============================================================================
+# SCAN CONFIGURATION
+# ============================================================================
+
+# Directories to scan for Dart files (relative to project root)
+# Default: ['lib/']
+scan_paths:
+          - lib/
+
+# Include test directory in scan
+# Default: false
+include_tests: false
+
+# Include generated files (.g.dart, .freezed.dart, etc.)
+# Default: true
+include_generated_files: true
+
+# ============================================================================
+# ASSET DETECTION
+# ============================================================================
+
+# Additional asset path prefixes to recognize in string literals
+# Default: ['assets/', 'packages/']
+asset_prefixes:
+          - assets/
+          - packages/
+          # Add custom prefixes if you use non-standard asset paths:
+          # - images/
+          # - resources/
+
+# ============================================================================
+# EXCLUSIONS & WHITELIST
+# ============================================================================
+
+# Glob patterns for assets to exclude from analysis
+# Assets matching these patterns will be marked as "whitelisted" and not
+# reported as unused. Use for assets you know are needed but can't be detected.
+exclude_patterns:
+          # Generated assets (e.g., from build tools)
+          # - "assets/generated/**"
+
+          # Placeholder/fallback images
+          # - "assets/placeholders/**"
+
+          # Third-party assets
+          # - "assets/vendor/**"
+
+# Annotation names that mark assets as required
+# These annotations can be placed on classes/functions that use dynamic assets
+# Default: ['KeepAsset', 'KeepAssets', 'PreserveAsset']
+keep_annotations:
+          - KeepAsset
+          - KeepAssets
+          - PreserveAsset
+
+# ============================================================================
+# DYNAMIC ASSET PATTERNS
+# ============================================================================
+
+# Known dynamic asset patterns to whitelist
+# Use when assets are loaded dynamically (e.g., 'assets/avatars/$id.png')
+# The tool will detect some patterns automatically, but you can add known ones here.
+dynamic_patterns:
+          # User avatars loaded by ID
+          # - "assets/avatars/*.png"
+
+          # Locale files loaded based on device settings
+          # - "assets/locales/*.json"
+
+          # Level/game assets loaded dynamically
+          # - "assets/levels/level_*.json"
+          # - "assets/sprites/character_*.png"
+
+# ============================================================================
+# CI/CD INTEGRATION
+# ============================================================================
+
+# Fail the build if unused assets are found (CI/CD mode)
+# Default: false
+strict_mode: false
+
+# ============================================================================
+# REPORTING
+# ============================================================================
+
+# Generate a report file after analysis
+# Default: true
+generate_report: true
+
+# Report format: markdown, json, or html
+# Default: markdown
+report_format: markdown
+# Custom report output path (optional)
+# Default: asset_report.md (or .json/.html based on format)
+# report_output_path: "reports/asset_report.md"

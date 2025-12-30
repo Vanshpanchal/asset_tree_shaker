@@ -1,0 +1,35 @@
+# Dart/Flutter
+.dart_tool/
+.packages
+build/
+pubspec.lock
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Coverage
+coverage/
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test outputs
+.test_coverage/
+
+# Local configuration
+.env
+.env.local
+
+# Backup files created by asset_tree_shaker
+.asset_backup_*.json
