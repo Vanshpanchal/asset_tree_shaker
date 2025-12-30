@@ -11,6 +11,7 @@ Future<void> main(List<String> arguments) async {
     'asset_tree_shaker',
     'Detect and remove unused assets from Flutter projects.',
   )
+    ..addCommand(CheckCommand())
     ..addCommand(AnalyzeCommand())
     ..addCommand(CleanCommand())
     ..addCommand(ReportCommand())
@@ -96,6 +97,191 @@ abstract class BaseCommand extends Command<int> {
 
   void printInfo(String message) {
     print('\x1B[34mℹ\x1B[0m $message');
+  }
+}
+
+/// Command to check assets, show status, generate report, and optionally clean - all in one.
+class CheckCommand extends BaseCommand {
+  @override
+  final name = 'check';
+
+  @override
+  final description =
+      'Analyze assets, show used/unused status, generate report, and optionally clean.';
+
+  CheckCommand() {
+    argParser.addOption(
+      'output',
+      abbr: 'o',
+      help: 'Output path for the report file.',
+      defaultsTo: 'asset_report.md',
+    );
+    argParser.addFlag(
+      'no-report',
+      help: 'Skip generating report file.',
+      negatable: false,
+    );
+    argParser.addFlag(
+      'clean',
+      help: 'Prompt to clean unused assets after analysis.',
+      negatable: false,
+      defaultsTo: true,
+    );
+  }
+
+  @override
+  Future<int> run() async {
+    final config = await loadConfig();
+    final outputPath = argResults!['output'] as String;
+    final noReport = argResults!['no-report'] as bool;
+
+    print('');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│                 🌳 Asset Tree Shaker                        │');
+    print('└─────────────────────────────────────────────────────────────┘');
+    print('');
+    print('📂 Project: $projectRoot');
+    print('');
+
+    // Discover assets
+    print('🔍 Scanning...');
+    final discovery = AssetDiscovery(projectRoot: projectRoot);
+    final declaredAssets = await discovery.discoverAssets();
+
+    // Scan for usages
+    final scanner = UsageScanner(projectRoot: projectRoot, config: config);
+    final scanResult = await scanner.scan();
+
+    // Analyze
+    final analyzer = GraphAnalyzer(config: config);
+    final result = analyzer.analyze(
+      declaredAssets: declaredAssets,
+      scanResult: scanResult,
+      projectRoot: projectRoot,
+    );
+
+    // Print asset list with status
+    print('');
+    print('┌─────────────────────────────────────────────────────────────┐');
+    print('│                     Asset Status                            │');
+    print('├─────────────────────────────────────────────────────────────┤');
+
+    // Sort assets: unused first, then used
+    final allAssets = [...result.assets];
+    allAssets.sort((a, b) {
+      if (a.status == AssetStatus.unused && b.status != AssetStatus.unused) {
+        return -1;
+      }
+      if (a.status != AssetStatus.unused && b.status == AssetStatus.unused) {
+        return 1;
+      }
+      return a.path.compareTo(b.path);
+    });
+
+    for (final asset in allAssets) {
+      final status = _getStatusLabel(asset.status);
+      final size = _formatBytes(asset.fileSize ?? 0);
+      final fileName = asset.path.length > 45
+          ? '...${asset.path.substring(asset.path.length - 42)}'
+          : asset.path;
+      print('│ $status ${fileName.padRight(45)} $size');
+    }
+
+    print('└─────────────────────────────────────────────────────────────┘');
+    print('');
+
+    // Summary
+    final summary = result.summary;
+    print('📊 Summary:');
+    print('   ✅ Used:     ${summary.usedAssets}');
+    print('   ❌ Unused:   ${summary.unusedAssets}');
+    print(
+        '   ⏭️  Skipped:  ${summary.whitelistedAssets + summary.dynamicMatchAssets + summary.annotatedAssets}');
+    print('');
+    print('   💾 Total size:   ${summary.totalSizeFormatted}');
+    print(
+        '   🗑️  Unused size:  ${summary.unusedSizeFormatted} (${summary.unusedSizePercentage.toStringAsFixed(1)}% savings)');
+    print('');
+
+    // Generate report
+    if (!noReport) {
+      final generator = ReportGenerator(result: result);
+      final report = generator.generate(ReportFormat.markdown);
+      final reportFile = File(path.join(projectRoot, outputPath));
+      await reportFile.writeAsString(report);
+      printSuccess('Report saved: $outputPath');
+      print('');
+    }
+
+    // Ask to clean if there are unused assets
+    if (result.unusedAssets.isNotEmpty) {
+      print('─────────────────────────────────────────────────────────────');
+      print('');
+      print(
+          '⚠️  Found ${result.unusedAssets.length} unused assets (${_formatBytes(result.unusedAssetsSize)})');
+      print('');
+      stdout.write('🧹 Do you want to delete these unused assets? [y/N]: ');
+      final response = stdin.readLineSync()?.toLowerCase().trim();
+
+      if (response == 'y' || response == 'yes') {
+        print('');
+        print('Creating backup...');
+        final cleaner = AssetCleaner(projectRoot: projectRoot);
+        final cleanResult = await cleaner.clean(
+          analysisResult: result,
+          dryRun: false,
+          createBackup: true,
+          removeFromPubspec: false,
+        );
+
+        print('');
+        if (cleanResult.backupFile != null) {
+          printInfo('Backup: ${path.basename(cleanResult.backupFile!)}');
+        }
+        printSuccess(
+            'Deleted ${cleanResult.deletedAssets.length} unused assets!');
+        print('   Freed: ${_formatBytes(cleanResult.totalDeletedSize)}');
+
+        if (cleanResult.hasFailures) {
+          print('');
+          printWarning(
+              '${cleanResult.failedDeletions.length} files could not be deleted.');
+        }
+      } else {
+        print('');
+        printInfo('No assets were deleted.');
+      }
+    } else {
+      printSuccess('All assets are in use! 🎉');
+    }
+
+    print('');
+    return 0;
+  }
+
+  String _getStatusLabel(AssetStatus status) {
+    switch (status) {
+      case AssetStatus.used:
+        return '\x1B[32m✓ USED    \x1B[0m';
+      case AssetStatus.unused:
+        return '\x1B[31m✗ UNUSED  \x1B[0m';
+      case AssetStatus.whitelisted:
+        return '\x1B[33m⏭ SKIPPED \x1B[0m';
+      case AssetStatus.dynamicMatch:
+        return '\x1B[33m⏭ DYNAMIC \x1B[0m';
+      case AssetStatus.annotated:
+        return '\x1B[34m📌 KEPT   \x1B[0m';
+      case AssetStatus.missing:
+        return '\x1B[35m? MISSING \x1B[0m';
+    }
+  }
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) return '${bytes.toString().padLeft(6)} B';
+    if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1).padLeft(6)} KB';
+    }
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1).padLeft(6)} MB';
   }
 }
 
