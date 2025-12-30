@@ -1,7 +1,7 @@
 # Asset Tree Shaker 🌳
 
 [![Pub Version](https://img.shields.io/pub/v/asset_tree_shaker)](https://pub.dev/packages/asset_tree_shaker)
-[![Dart CI](https://github.com/user/asset_tree_shaker/actions/workflows/ci.yml/badge.svg)](https://github.com/user/asset_tree_shaker/actions/workflows/ci.yml)
+[![Dart CI](https://github.com/Vanshpanchal/asset_tree_shaker/actions/workflows/ci.yml/badge.svg)](https://github.com/Vanshpanchal/asset_tree_shaker/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![pub points](https://img.shields.io/pub/points/asset_tree_shaker)](https://pub.dev/packages/asset_tree_shaker/score)
 
