@@ -5,11 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.1] - 2024-12-30
+## [1.1.2] - 2024-12-30
+
+### Added
+
+- **Complete Documentation** - Updated README.md with all commands and proper version references
+- **Changelog Documentation** - Full list of available commands in CHANGELOG
 
 ### Changed
 
-- Updated author email to vansh.panchal7@proton.me
+- Updated installation version reference to ^1.1.0
+- Reorganized README with `check` command as primary recommendation
+- Added detailed examples for all command options
+
+---
+
+## [1.1.1] - 2024-12-30
+
+### Added
+
+- **Comprehensive Documentation** - Updated README with all commands and version numbers
+- **Author Information** - Added author email (vansh.panchal7@proton.me)
+
+### Commands Available (v1.1.1)
+
+- `check` - All-in-one analysis, reporting, and cleanup with interactive prompt
+- `analyze` - Analyze and report unused assets
+- `report` - Generate detailed reports (Markdown, JSON, HTML)
+- `clean` - Remove unused assets with backup
+- `init` - Create default configuration
+- `restore` - Restore from backup
 
 ---
 
@@ -17,7 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **New `check` Command** - All-in-one command for asset analysis   
+- **New `check` Command** - All-in-one command for asset analysis
      - Shows all assets with visual used/unused status indicators
      - Displays file sizes and colored status labels
      - Automatically generates markdown report

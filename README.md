@@ -22,7 +22,7 @@ Add to your `dev_dependencies`:
 
 ```yaml
 dev_dependencies:
-  asset_tree_shaker: ^1.0.0
+          asset_tree_shaker: ^1.1.0
 ```
 
 Or install globally:
@@ -34,6 +34,9 @@ dart pub global activate asset_tree_shaker
 ## 🚀 Quick Start
 
 ```bash
+# All-in-one: analyze, show status, generate report, and optionally clean
+dart run asset_tree_shaker check
+
 # Analyze your project
 dart run asset_tree_shaker analyze
 
@@ -48,6 +51,35 @@ dart run asset_tree_shaker analyze --strict
 ```
 
 ## 📖 Commands
+
+### `check` ⭐ (Recommended)
+
+All-in-one command: analyze assets, display status, generate report, and optionally clean.
+
+```bash
+dart run asset_tree_shaker check [options]
+
+Options:
+  -p, --project     Path to Flutter project root (default: .)
+  -o, --output      Output path for the report file (default: asset_report.md)
+  -c, --config      Path to configuration file
+  -v, --verbose     Enable verbose output
+      --no-report   Skip generating report file
+      --clean       Prompt to clean unused assets (default: on)
+```
+
+**Example:**
+
+```bash
+# Full analysis with interactive cleanup prompt
+dart run asset_tree_shaker check
+
+# Skip report generation
+dart run asset_tree_shaker check --no-report
+
+# Custom report name
+dart run asset_tree_shaker check -o my_assets_report.md
+```
 
 ### `analyze`
 
@@ -111,17 +143,17 @@ Create `asset_tree_shaker.yaml` in your project root:
 ```yaml
 # Directories to scan for Dart files
 scan_paths:
-  - lib/
+          - lib/
 
 # Patterns to exclude from analysis
 exclude_patterns:
-  - "assets/generated/**"
-  - "assets/placeholders/**"
+          - "assets/generated/**"
+          - "assets/placeholders/**"
 
 # Known dynamic patterns (for runtime-loaded assets)
 dynamic_patterns:
-  - "assets/avatars/*.png"
-  - "assets/locales/*.json"
+          - "assets/avatars/*.png"
+          - "assets/locales/*.json"
 
 # CI/CD: fail on unused assets
 strict_mode: false
@@ -148,7 +180,7 @@ Image.asset('assets/images/${user.id}.png');
 
 ```yaml
 dynamic_patterns:
-  - "assets/avatars/*.png"
+          - "assets/avatars/*.png"
 ```
 
 ### 3. Annotations
@@ -176,8 +208,8 @@ class SoundManager { }
 
 ```yaml
 asset-check:
-  script:
-    - dart run asset_tree_shaker analyze --strict
+          script:
+                    - dart run asset_tree_shaker analyze --strict
 ```
 
 ## 📚 API Usage
@@ -205,11 +237,11 @@ print('Unused assets: ${result.unusedAssets.length}');
 
 ## 📋 Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | Unused assets found (strict mode) or operation failed |
-| 64 | Usage error (invalid arguments) |
+| Code | Meaning                                               |
+| ---- | ----------------------------------------------------- |
+| 0    | Success                                               |
+| 1    | Unused assets found (strict mode) or operation failed |
+| 64   | Usage error (invalid arguments)                       |
 
 ## 🤝 Contributing
 

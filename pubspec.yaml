@@ -2,7 +2,7 @@ name: asset_tree_shaker
 description: >-
           A build-time tool that detects and removes unused assets from Flutter projects.
           Uses AST analysis to accurately identify asset references in Dart code.
-version: 1.1.1
+version: 1.1.2
 homepage: https://github.com/Vanshpanchal/asset_tree_shaker
 repository: https://github.com/Vanshpanchal/asset_tree_shaker
 issue_tracker: https://github.com/Vanshpanchal/asset_tree_shaker/issues
